@@ -1,6 +1,6 @@
 const dbConfig = require("../database/dbConfig");
 
-async function ChangePassword(req, res,next){
+async function ChangePassword(req, res){
 
     const{newpassword, confrimpassword} = req.body;
 
@@ -11,17 +11,17 @@ async function ChangePassword(req, res,next){
             confrim_pass:confrimpassword
         })
         if(result){
-            res.status(200).json({status:true, data: result})
+            res.status(200).json({status:true, data: result,message:"success!!!"})
         }
         else{
             console.log(req.body);
-            res.status(500).json({status:false})
+            res.status(500).json({status:false,data:false,message:" Failed"})
         }
     }
     else{
-        console.log("doesn't match password!");
+        res.status(200).json({status:false,message:"password dont matched!!!"})
     }
-    next()
+ 
 
     
   

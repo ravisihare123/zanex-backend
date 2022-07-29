@@ -18,7 +18,7 @@ async function adminlogin(req, res){
         // console.log(result);
         var token =jwt.sign({
             data: 'foobar'
-          },config.secret , { expiresIn: "40s" });
+          },config.secret , { expiresIn: "1m" });
         //   console.log(token);
         res.status(200).json({status:true,token:token,data:result})
     }
