@@ -4,12 +4,16 @@ const config = require("../nodemon.json");
 const bcrypt = require("bcrypt");
 
 async function adminDisplay(req, res) {
+  // console.log(req.body)
   var email = req.body.email;
   var password = req.body.password;
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
+  // const strings = undefined;
   const passwordToString = password.toString();
   const encrpytPassword = bcrypt.compareSync(passwordToString, salt);
+
+// console.log({email,passwordToString, encrpytPassword})
 
   var result = await dbConfig
     .select()
@@ -39,6 +43,7 @@ async function adminLogin(req, res) {
   const saltRounds = 10;
   const salt = bcrypt.genSaltSync(saltRounds);
   const password = req.body.password;
+  // const string = undefined;
   const passwordToString = password.toString();
   const bcryptPassword = bcrypt.hashSync(passwordToString, salt);
   var result = await dbConfig("login").insert({
@@ -46,7 +51,7 @@ async function adminLogin(req, res) {
     login_password: bcryptPassword,
   });
   if (result) {
-    console.log(result);
+    // console.log(result);
     res.status(200).json({ status: true, data: result });
   } else {
     console.log(req.body);
