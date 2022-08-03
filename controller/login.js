@@ -22,15 +22,14 @@ async function adminDisplay(req, res) {
       login_password: encrpytPassword,
     })
     .from("login");
+  console.log(result);
   if (result.length == 0) {
     // console.log(req.body);
     res.status(200).json({ status: false });
   } else {
     // console.log(result);
     var token = jwt.sign(
-      {
-        data: "foobar",
-      },
+      {email:result.login_email,name:result.login_name},
       config.secret,
       { expiresIn: "1m" }
     );
@@ -40,15 +39,18 @@ async function adminDisplay(req, res) {
 }
 
 async function adminLogin(req, res) {
-  const saltRounds = 10;
-  const salt = bcrypt.genSaltSync(saltRounds);
+
+  console.log(req.body)
   const password = req.body.password;
-  // const string = undefined;
-  const passwordToString = password.toString();
-  const bcryptPassword = bcrypt.hashSync(passwordToString, salt);
+ 
+  
+  var salt =  bcrypt.genSaltSync(10);
+  console.log(password, salt)
+  var hash =  bcrypt.hashSync(password, salt);
+
   var result = await dbConfig("login").insert({
     login_email: req.body.email,
-    login_password: bcryptPassword,
+    login_password: hash,
   });
   if (result) {
     // console.log(result);

@@ -11,8 +11,8 @@ module.exports = async (req, res, next) => {
     } catch (error) {
         console.log(error)
         return res.status(200).json({
-            message: 'Auth failed'
+          message: " Invalid token !",
+        });
 
-        })
     }
 }
