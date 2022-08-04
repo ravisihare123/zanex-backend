@@ -22,14 +22,14 @@ async function adminDisplay(req, res) {
       login_password: encrpytPassword,
     })
     .from("login");
-  console.log(result);
+  console.log(result[0].login_email);
   if (result.length == 0) {
     // console.log(req.body);
     res.status(200).json({ status: false });
   } else {
     // console.log(result);
     var token = jwt.sign(
-      {email:result.login_email,name:result.login_name},
+      { email: result[0].login_email, name: result[0].login_name },
       config.secret,
       { expiresIn: "1m" }
     );
