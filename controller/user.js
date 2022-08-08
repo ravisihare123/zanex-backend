@@ -1,21 +1,38 @@
 const dbConfig = require("../database/dbConfig");
 
 async function insertUser(req, res) {
-  var result = await dbConfig("user").insert({
-    first_name: req.body.firstname,
-    last_name: req.body.lastname,
-    phone_number: req.body.phonenumber,
-    user_image: req.myfilename,
-  });
+  const { Id } = req.body;
+  if (Id == "") {
+  
+  
+    var result = await dbConfig("user").insert({
+      first_name: req.body.firstname,
+      last_name: req.body.lastname,
+      phone_number: req.body.phonenumber,
+      user_image: req.myfilename,
+    });
 
-  console.log(req.myfilename)
+    console.log(req.myfilename)
+    
+    
+  }
+  else {
+    var result = await dbConfig("user").where("userid", Id).update({
+      first_name: req.body.firstname,
+      last_name: req.body.lastname,
+      phone_number: req.body.phonenumber,
+      user_image: req.myfilename,
+    });
     if (result) {
-      res.status(200).json({status: true, data: result})
+      res.status(200).json({ status: true, data: result });
+    } else {
+      res.status(500).json({ status: false, data: false });
     }
-    else {
-        res.status(500).json({status: false, data: false})
-    }
+  }
+
 }
+
+
 
 async function displayUser(req, res) {
 
@@ -23,7 +40,7 @@ async function displayUser(req, res) {
   var offset = (page - 1) * [parseInt(perpage)];
   var total = total / parseInt(perpage);
   
-  var result = await dbConfig.select().from("user").limit(parseInt(perpage)).offset(offset)
+  var result = await dbConfig.select().where("is_delete",0).from("user").limit(parseInt(perpage)).offset(offset)
   if (result) {
     res.status(200).json({ status: true,total_page:Math.ceil(total), data: result });
   } else {
@@ -31,8 +48,28 @@ async function displayUser(req, res) {
   }
 }
 
+async function updateDelete(req, res) {
+  const { userid } = req.body;
+  var result = await dbConfig("user").where("userid",userid).update({
+    is_delete:1
+  })
+  if (result) {
+    res.json({
+      status:true,
+      data:result
+    })
+  }
+  else {
+    res.json({
+      status: false,
+      data: false
+    })
+  }
+}
+
 const user = {
   insertUser,
   displayUser,
+  updateDelete,
 };
 module.exports = user;

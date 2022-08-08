@@ -6,5 +6,6 @@ const multer = require("./multer");
 /* GET users listing. */
 router.post('/insertUser',multer.single("img"), user.insertUser);
 router.post('/displayUser', user.displayUser);
+router.post('/delete', user.updateDelete);
 
 module.exports = router;
