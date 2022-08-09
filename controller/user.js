@@ -1,23 +1,50 @@
 const dbConfig = require("../database/dbConfig");
 
 async function insertUser(req, res) {
-  const { Id } = req.body;
-  if (Id == "") {
-  
-  
-    var result = await dbConfig("user").insert({
+  const { userid } = req.body;
+  if (userid) {
+    var result = await dbConfig("user").where("userid", userid).update({
       first_name: req.body.firstname,
       last_name: req.body.lastname,
       phone_number: req.body.phonenumber,
       user_image: req.myfilename,
     });
-
-    console.log(req.myfilename)
-    
-    
+    if (result) {
+      res.status(200).json({ status: true, data: result });
+    } else {
+      console.log("update log");
+      res.status(500).json({ status: false, data: false });
+    }
   }
+  // var result = await dbConfig("user").insert({
+  //   first_name: req.body.firstname,
+  //   last_name: req.body.lastname,
+  //   phone_number: req.body.phonenumber,
+  //   user_image: req.myfilename,
+  // });
+  //  if (result) {
+  //    res.status(200).json({ status: true, data: result });
+  //  } else {
+  //    res.status(500).json({ status: false, data: false });
+  //  }
+
+  // console.log(req.myfilename);
   else {
-    var result = await dbConfig("user").where("userid", Id).update({
+    //   var result = await dbConfig("user").where("userid", userid).update({
+    //     first_name: req.body.firstname,
+    //     last_name: req.body.lastname,
+    //     phone_number: req.body.phonenumber,
+    //     user_image: req.myfilename,
+    //   });
+    //   if (result) {
+    //     res.status(200).json({ status: true, data: result });
+    //   } else {
+    //     console.log("update log");
+    //     res.status(500).json({ status: false, data: false });
+    //   }
+    // }
+
+    var result = await dbConfig("user").insert({
       first_name: req.body.firstname,
       last_name: req.body.lastname,
       phone_number: req.body.phonenumber,
@@ -29,7 +56,6 @@ async function insertUser(req, res) {
       res.status(500).json({ status: false, data: false });
     }
   }
-
 }
 
 
