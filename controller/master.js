@@ -55,6 +55,7 @@ async function deleteAirport(req, res) {
        const {  id } = req.body;
 
        await dbConfig("airport_master").where("id", id).update({ isdelete: 1 });
+       console.log(id);
        await dbConfig("logs").insert({
          event_Id: id,
          event_name: "Airport",
