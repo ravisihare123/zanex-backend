@@ -67,7 +67,7 @@ async function displayUser(req, res) {
   var total = total / parseInt(perpage);
   
   var result = await dbConfig.select().where("is_delete", 0).from("user").limit(parseInt(perpage)).offset(offset)
-  console.log(result);
+  // console.log(result);
   if (result) {
     res.status(200).json({ status: true,total_page:Math.ceil(total), data: result });
   } else {

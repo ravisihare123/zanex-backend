@@ -31,7 +31,7 @@ async function adminDisplay(req, res) {
     var token = jwt.sign(
       { email: result[0].login_email, name: result[0].login_name },
       config.secret,
-      { expiresIn: "1m" }
+      { expiresIn: "1h" }
     );
     //   console.log(token);
     res.status(200).json({ status: true, token: token, data: result });
