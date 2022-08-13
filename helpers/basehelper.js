@@ -1,7 +1,7 @@
 const {verify} = require("jsonwebtoken");
 const config = require("../nodemon.json")
 
-async function checkAdminToken  (req, res, next)  {
+const  checkAdminToken = (req, res, next)=>  {
  let token = req.get("authorization");
  if (token) {
    // Remove Bearer from string
