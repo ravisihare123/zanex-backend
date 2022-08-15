@@ -8,7 +8,7 @@ require("dotenv").config();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var loginRouter = require('./routes/login');
+var adminRouter = require('./routes/admin');
 var changepasswordRouter = require("./routes/changepassword");
 var mastersRouter = require("./routes/masters");
 var app = express();
@@ -25,7 +25,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/user', usersRouter);
-app.use('/login', loginRouter);
+app.use('/admin', adminRouter);
 app.use('/master', mastersRouter);
 app.use("/changepassword",changepasswordRouter);
 
