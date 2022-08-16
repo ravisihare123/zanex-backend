@@ -19,4 +19,12 @@ router.post("/inserteditaircraft",baseHelper.checkAdminToken,master.insertEditAi
 router.post("/aircraftList", baseHelper.checkAdminToken, master.aircraftList);
 router.post('/deleteaircraft', baseHelper.checkAdminToken, master.deleteaircraft);
 
+//pilot
+router.post("/inserteditpilot", baseHelper.checkAdminToken, master.insertEditPilot);
+router.post("/pilotlist", baseHelper.checkAdminToken, master.pilotList);
+router.post("/deletepilot", baseHelper.checkAdminToken, master.deletePilot);
+
+//pax
+router.post("/inserteditpax", baseHelper.checkAdminToken, master.insertEditPax);
+
 module.exports = router;
