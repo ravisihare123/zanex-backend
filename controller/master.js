@@ -1,109 +1,112 @@
 const dbConfig = require("../database/dbConfig");
 
-// airport 
+// airport
 async function insertEdit_Airport(req, res) {
-   try {
-     const {  id, name, code, terminal } = req.body;
+  try {
+    const { uid, id, name, code, terminal } = req.body;
 
-     const getData = await dbConfig("airport_master").where("id", id).first();
+    const getData = await dbConfig("airport_master").where("id", id).first();
 
-     var data = {
-       name: name,
-       code: code,
-       terminal: terminal,
-     };
+    var data = {
+      name: name,
+      code: code,
+      terminal: terminal,
+    };
 
-     if (getData) {
-       data.updateAt = new Date();
-       data.updateBy = 1;
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = uid;
 
-       await dbConfig("airport_master").where("id", id).update(data);
-       await dbConfig("logs").insert({
-         event_Id: id,
-         event_name: "Airport",
-         type: "update",
-         createAt: new Date(),
-         createBy: 1,
-       });
-       return res.json({
-         status: true,
-         msg: "Updated Successfully!!!",
-       });
-     } else {
-       data.createAt = new Date();
-       data.createBy = 1;
+      await dbConfig("airport_master").where("id", id).update(data);
+      await dbConfig("logs").insert({
+        event_Id: id,
+        event_name: "Airport",
+        type: "update",
+        createAt: new Date(),
+        createBy: uid,
+      });
+      return res.json({
+        status: true,
+        msg: "Updated Successfully!!!",
+      });
+    } else {
+      data.createAt = new Date();
+      data.createBy = uid;
 
-       const checkAdmin = await dbConfig("airport_master")
-         .where("code", code)
-         .where("isdelete", 0)
-         .first();
+      const checkAdmin = await dbConfig("airport_master")
+        .where("code", code)
+        .where("isdelete", 0)
+        .first();
 
-       if (checkAdmin) {
-         return res.json({
-           status: false,
-           msg: "code No. Already Inserted!!!",
-         });
-       }
+      if (checkAdmin) {
+        return res.json({
+          status: false,
+          msg: "code No. Already Inserted!!!",
+        });
+      }
 
-       var insert = await dbConfig("airport_master").insert(data);
-       await dbConfig("logs").insert({
-         event_Id: insert[0],
-         event_name: "Airport",
-         type: "INSERT",
-         createAt: new Date(),
-         createBy: 1,
-       });
-       return res.json({
-         status: true,
-         msg: "Inserted Successfully!!!",
-       });
-     }
-   } catch (err) {
-     return res.json({
-       status: false,
-       msg: err.message,
-     });
-   }
+      var insert = await dbConfig("airport_master").insert(data);
+      await dbConfig("logs").insert({
+        event_Id: insert[0],
+        event_name: "Airport",
+        type: "INSERT",
+        createAt: new Date(),
+        createBy: uid,
+      });
+      return res.json({
+        status: true,
+        msg: "Inserted Successfully!!!",
+      });
+    }
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
-async function airportList  (req, res)  {
-    try {
-        const getList = await dbConfig("airport_master").select("id", "name", "code", "terminal").where("isdelete", 0)
-        return res.json({
-            status: true,
-            data: getList
-        })
-    } catch (err) {
-        return res.json({
-            status: false,
-            msg:err.message
-        })
-    }
+async function airportList(req, res) {
+  const { uid } = req.body;
+  try {
+    const getList = await dbConfig("airport_master")
+      .select("id", "name", "code", "terminal")
+      .where("isdelete", 0);
+    return res.json({
+      status: true,
+      data: getList,
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
 }
 
 async function deleteAirport(req, res) {
-     try {
-       const {  id } = req.body;
+  try {
+    const { uid, id } = req.body;
 
-       await dbConfig("airport_master").where("id", id).update({ isdelete: 1 });
-       console.log(id);
-       await dbConfig("logs").insert({
-         event_Id: id,
-         event_name: "Airport",
-         type: "DELETE",
-         createAt: new Date(),
-         createBy: 1,
-       });
-       return res.json({
-         st: true,
-         msg: "Deleted Successfully!!!",
-       });
-     } catch (err) {
-       return res.json({
-         st: false,
-         msg: err.message,
-       });
-     }
+    await dbConfig("airport_master").where("id", id).update({ isdelete: 1 });
+    console.log(id);
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "Airport",
+      type: "DELETE",
+      createAt: new Date(),
+      createBy: uid,
+    });
+    return res.json({
+      st: true,
+      msg: "Deleted Successfully!!!",
+    });
+  } catch (err) {
+    return res.json({
+      st: false,
+      msg: err.message,
+    });
+  }
 }
 
 //aircraftcategory
@@ -111,22 +114,30 @@ async function deleteAirport(req, res) {
 async function insertEdit_AircraftCategory(req, res) {
   try {
     const {
-      id,name,capacity,fual_charge,maintenance_hour,block_seat,
+      uid,
+      id,
+      name,
+      capacity,
+      fual_charge,
+      maintenance_hour,
+      block_seat,
     } = req.body;
 
-     var data = {
-       name: name,
-       capacity: capacity,
-       fual_charge: fual_charge,
-       maintenance_hour: maintenance_hour,
-       block_seat: block_seat,
-       createAt: new Date(),
-       createBy: 1,
-     };
-    var getData = await dbConfig("aircraftcategory_master").where("id", id).first();
+    var data = {
+      name: name,
+      capacity: capacity,
+      fual_charge: fual_charge,
+      maintenance_hour: maintenance_hour,
+      block_seat: block_seat,
+      createAt: new Date(),
+      createBy: uid,
+    };
+    var getData = await dbConfig("aircraftcategory_master")
+      .where("id", id)
+      .first();
     if (getData) {
-      data.updateAt = new Date()
-      data.updateBy = 1;
+      data.updateAt = new Date();
+      data.updateBy = uid;
 
       await dbConfig("aircraftcategory_master").where("id", id).update(data);
       await dbConfig("logs").insert({
@@ -134,17 +145,15 @@ async function insertEdit_AircraftCategory(req, res) {
         event_name: "Aircraft Category",
         type: "UPDATE",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
       return res.json({
         status: true,
-        msg: "update succesfully!"
-      })
-
-    }
-    else {
+        msg: "update succesfully!",
+      });
+    } else {
       data.createAt = new Date();
-      data.createBy = 1;
+      data.createBy = uid;
 
       const checkAdmin = await dbConfig("aircraftcategory_master")
         .where("name", name)
@@ -153,29 +162,28 @@ async function insertEdit_AircraftCategory(req, res) {
       if (checkAdmin) {
         return res.json({
           status: false,
-          msg :" Already aircraftcategory inserted!!! "
-        })
+          msg: " Already aircraftcategory inserted!!! ",
+        });
       }
-    
+
       var insert = await dbConfig("aircraftcategory_master").insert(data);
       await dbConfig("logs").insert({
         event_Id: insert[0],
         event_name: "Aircraft Category",
         type: "INSERT",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
     }
     return res.json({
       st: true,
       msg: "Inserted Successfully!!!",
     });
-  }
-  catch (err) {
+  } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
 }
 async function getAircraftCategory(req, res) {
@@ -196,54 +204,53 @@ async function getAircraftCategory(req, res) {
   }
 }
 
-
 async function aircraftcategoryList(req, res) {
   try {
-    const getList = await dbConfig("aircraftcategory_master").select(
-      "id",
-      "name",
-      "capacity",
-      "fual_charge",
-      "maintenance_hour",
-      "block_seat"
-    ).where("isdelete", 0)
+    const getList = await dbConfig("aircraftcategory_master")
+      .select(
+        "id",
+        "name",
+        "capacity",
+        "fual_charge",
+        "maintenance_hour",
+        "block_seat"
+      )
+      .where("isdelete", 0);
     return res.json({
       status: true,
-      data: getList
-    })
-    
-
-    
+      data: getList,
+    });
   } catch (err) {
     return res.json({
       status: true,
-      msg : err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
 async function deleteaircraftcategory(req, res) {
   try {
-    const {  id } = req.body;
+    const { uid, id } = req.body;
 
-    await dbConfig("aircraftcategory_master").where("id", id).update({ isdelete: 1 });
+    await dbConfig("aircraftcategory_master")
+      .where("id", id)
+      .update({ isdelete: 1 });
     await dbConfig("logs").insert({
       event_Id: id,
       event_name: "Aircraft Category",
       type: "DELETE",
       createAt: new Date(),
-      createBy: 1,
+      createBy: uid,
     });
     return res.json({
       status: true,
       msg: "Deleted Successfully!!!",
     });
-    
   } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
@@ -263,7 +270,7 @@ async function insertEditAircraft(req, res) {
 
     if (getData) {
       data.updateAt = new Date();
-      data.updateBy = 1;
+      data.updateBy = uid;
 
       await dbConfig("aircraft_master").where("id", id).update(data);
       await dbConfig("logs").insert({
@@ -271,7 +278,7 @@ async function insertEditAircraft(req, res) {
         event_name: "Aircraft",
         type: "UPDATE",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
       return res.json({
         status: true,
@@ -279,7 +286,7 @@ async function insertEditAircraft(req, res) {
       });
     } else {
       data.createAt = new Date();
-      data.createBy = 1;
+      data.createBy = uid;
 
       const checkAdmin = await dbConfig("aircraft_master")
         .where("plane_no", plane_no)
@@ -299,7 +306,7 @@ async function insertEditAircraft(req, res) {
         event_name: "Aircraft",
         type: "INSERT",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
       return res.json({
         status: true,
@@ -325,19 +332,18 @@ async function aircraftList(req, res) {
         "c.name as category_name"
       )
       .leftJoin("aircraftcategory_master as c", "c.id", "=", "a.category_id")
-      
+
       .where("a.isdelete", 0);
     // console.log(getList );
     return res.json({
-        status: true,
-        data: getList
-      })
-    
+      status: true,
+      data: getList,
+    });
   } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
@@ -351,7 +357,7 @@ async function deleteaircraft(req, res) {
       event_name: "Aircraft",
       type: "DELETE",
       createAt: new Date(),
-      createBy: 1,
+      createBy: uid,
     });
     return res.json({
       status: true,
@@ -363,19 +369,21 @@ async function deleteaircraft(req, res) {
       msg: err.message,
     });
   }
-
 }
 
 // pilot
 
 async function insertEditPilot(req, res) {
-  console.log(req.body);
   try {
+    console.log(req.body);
     const { uid, id, name, mobile, alt_mobile, email, address, licence_no } =
       req.body;
+    
+    console.log(id);
 
-    const licence_doc = req?.files?.licence_doc;
-    const gov_doc = req?.files?.gov_doc;
+    const licence_doc = req?.file?.licence_doc;
+    const gov_doc = req?.file?.gov_doc;
+    console.log(licence_doc);
 
     const fs = require("fs");
     const path = require("path");
@@ -386,6 +394,7 @@ async function insertEditPilot(req, res) {
       date.getFullYear(),
     ];
     var dirName = day + "-" + month + "-" + year;
+console.log(dirName);
 
     var data = {
       name: name,
@@ -394,13 +403,15 @@ async function insertEditPilot(req, res) {
       email: email,
       address: address,
       licence_no: licence_no,
-      
+      // licence_doc:licence_doc,
+      // gov_doc: gov_doc,
     };
-
+    
     let dir_path, upload_path;
     if (licence_doc) {
       dir_path = "/licence_doc/" + dirName + "/";
       upload_path = process.cwd() + "/public" + dir_path;
+      console.log(upload_path);
       if (!fs.existsSync(upload_path)) {
         fs.mkdirSync(upload_path, { recursive: true });
       }
@@ -430,41 +441,47 @@ async function insertEditPilot(req, res) {
       data.gov_doc = dir_path + gov_doc_name;
     }
 
-    const getData = await dbConfig("pilot_master").where("id", id).first();
+    // if (id === "undefined") {
+     data.createAt = new Date();
+     data.createBy = uid;
 
-    if (getData) {
-      data.updateAt = new Date();
-      data.updateBy = 1;
+     await dbConfig("pilot_master").insert(data);
+     // await dbConfig("logs").insert({
+     //   event_Id: insert[0],
+     //   event_name: "Pilot",
+     //   type: "INSERT",
+     //   createAt: new Date(),
+     //   createBy: uid,
+     // });
+     return res.json({
+       st: true,
+       msg: "Inserted Successfully!!!",
+     }); 
+    // }
+    
+  } catch (err) {
+    return res.json({
+      st: false,
+      msg: err.message,
+    });
+  }
+}
 
-      await dbConfig("pilot_master").where("id", id).update(data);
-      await dbConfig("logs").insert({
-        event_Id: id,
-        event_name: "Pilot",
-        type: "UPDATE",
-        createAt: new Date(),
-        createBy: 1,
-      });
-      return res.json({
-        status: true,
-        msg: "Updated Successfully!!!",
-      });
-    } else {
-      data.createAt = new Date();
-      data.createBy = 1;
-
-      var insert = await dbConfig("pilot_master").insert(data);
-      await dbConfig("logs").insert({
-        event_Id: insert[0],
-        event_name: "Pilot",
-        type: "INSERT",
-        createAt: new Date(),
-        createBy: 1,
-      });
-      return res.json({
-        status: true,
-        msg: "Inserted Successfully!!!",
-      });
-    }
+async function deletePilot(req, res) {
+  try {
+    const { uid, id } = req.body;
+    await dbConfig("pilot_master").where("id", id).update({ isdelete: 1 });
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "Pilot",
+      type: "DELETE",
+      createAt: new Date(),
+      createBy: uid,
+    });
+    return res.json({
+      st: true,
+      msg: "Deleted Successfully!!!",
+    });
   } catch (err) {
     return res.json({
       status: false,
@@ -473,53 +490,30 @@ async function insertEditPilot(req, res) {
   }
 }
 
-async function deletePilot(req, res){
-  try {
-    const { id } = req.body;
-     await dbConfig("pilot_master").where("id", id).update({ isdelete: 1 });
-     await dbConfig("logs").insert({
-       event_Id: id,
-       event_name: "Pilot",
-       type: "DELETE",
-       createAt: new Date(),
-       createBy: uid,
-     });
-     return res.json({
-       st: true,
-       msg: "Deleted Successfully!!!",
-     });
-  
-  } catch (err) {
-    return res.json({
-      status: false,
-      msg: err.message
-    })
-}
-}
-
-
 async function pilotList(req, res) {
   try {
-
-    const getList = await dbConfig("pilot_master").select(
-      "id",
-      "name",
-      "mobile",
-      "alt_mobile",
-      "email",
-      "address",
-      "licence_no",
-      "licence_doc",
-      "gov_doc"
-    ).where("isdelete", 0)
+    const getList = await dbConfig("pilot_master")
+      .select(
+        "id",
+        "name",
+        "mobile",
+        "alt_mobile",
+        "email",
+        "address",
+        "licence_no",
+        "licence_doc",
+        "gov_doc"
+      )
+      .where("isdelete", 0);
     return res.json({
       status: true,
-      data: getList
-    })
+      data: getList,
+    });
   } catch (err) {
     return res.json({
       status: true,
-    msg: err.message})
+      msg: err.message,
+    });
   }
 }
 
@@ -539,7 +533,7 @@ async function insertEditPax(req, res) {
 
     if (getData) {
       data.updateAt = new Date();
-      data.updateBy = 1;
+      data.updateBy = uid;
 
       await dbConfig("pax_master").where("id", id).update(data);
       await dbConfig("logs").insert({
@@ -547,7 +541,7 @@ async function insertEditPax(req, res) {
         event_name: "Pax",
         type: "UPDATE",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
       return res.json({
         status: true,
@@ -555,7 +549,7 @@ async function insertEditPax(req, res) {
       });
     } else {
       data.createAt = new Date();
-      data.createBy = 1;
+      data.createBy = uid;
 
       const checkAdmin = await dbConfig("pax_master")
         .where("type", type)
@@ -575,36 +569,89 @@ async function insertEditPax(req, res) {
         event_name: "Pax",
         type: "INSERT",
         createAt: new Date(),
-        createBy: 1,
+        createBy: uid,
       });
       return res.json({
         status: true,
         msg: "Inserted Successfully!!!",
       });
     }
-  }
-  catch (err) {
+  } catch (err) {
     return res.json({
       status: false,
-      msg: err.message
-    })
+      msg: err.message,
+    });
   }
 }
 
+async function paxList(req, res) {
+  const { search_item } = req.body;
+  try {
+
+    // var searchs = await dbConfig("pax_master").where("code","like","%"+search_item+"%").first()
+    var getlist = await dbConfig("pax_master").select("id", "type", "code", "age_group", "description")
+      .where(function () {
+        this.where("code","like","%",+search_item+"%")
+      })
+      .where("isdelete", 0)
+    return res.json({
+      status: true,
+      data: getlist
+    })
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message
+    })
+  }
+}
+async function deletePax(req, res) {
+  try {
+    const { uid, id } = req.body;
+
+    await dbConfig("pax_master").where("id", id).update({ isdelete: 1 });
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "Pax",
+      type: "DELETE",
+      createAt: new Date(),
+      createBy: uid,
+    });
+    return res.json({
+      status: true,
+      msg: "Deleted Successfully!!!",
+    });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
+}
+
+
 const master = {
+  //airport
   insertEdit_Airport,
   airportList,
   deleteAirport,
+  //aircraftcategory
   insertEdit_AircraftCategory,
   aircraftcategoryList,
   deleteaircraftcategory,
   getAircraftCategory,
+  //aircfraft
   insertEditAircraft,
   aircraftList,
   deleteaircraft,
+  // pilot
   insertEditPilot,
   pilotList,
   deletePilot,
- insertEditPax
+  // pax
+  insertEditPax,
+  paxList,
+  deletePax
 };
 module.exports = master;
