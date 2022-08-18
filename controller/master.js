@@ -630,6 +630,133 @@ async function deletePax(req, res) {
   }
 }
 
+// farGrade
+async function insertEditFareGrade(req, res) {
+  try {
+    const { uid, id, grade_name, detail } = req.body; 
+    var data = {
+      grade_name: grade_name,
+      detail: JSON.stringify(detail)
+    }
+    const getData = await dbConfig("faregrade_master").where("id", id).first();
+    
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = uid
+
+      await dbConfig("faregrade_master").where("id", id).update(data);
+      await dbConfig("logs").insert({
+        event_Id: id,
+        event_name: "FareGrade",
+        type: " UPDATE",
+        createAt: new Date(),
+        createBy: uid
+      });
+      return res.json({
+        status: true,
+        msg: "Updated Successfully!!"
+      });
+    } else {
+data.createAt = new Date();
+       data.createBy = uid;
+      const CheckGrade = await dbConfig("faregrade_master").where("grade_name", grade_name)
+        .andWhere("isdelete", 0).first();
+      if (CheckGrade) {
+        return res.json({
+          status: false,
+          msg: "Data Already Inserted!!!"
+        });
+      }
+
+       
+       var insert = await dbConfig("faregrade_master").insert(data);
+       await dbConfig("logs").insert({
+         event_Id: insert[0],
+         event_name: "FareGrade",
+         type: "INSERT",
+         createAt: new Date(),
+         createBy: uid,
+       });
+       return res.json({
+         status: true,
+         msg: "Inserted Successflly!!",
+       });
+    }
+
+   
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+async function getPax(req, res) {
+  try {
+    var result = await dbConfig("pax_master").select("id", "type", "code").where("isdelete", 0);
+
+    var arr = [];
+    for (var i in result) {
+      arr.push({
+        value: result[i].id,
+        label: result[i].type,
+        code: result[i].code
+      })
+    }
+    return res.json({
+      status: true,
+      data: arr
+    })
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+async function fareGradeList(req, res) {
+  try {
+    
+    var result = await dbConfig("faregrade_master").select("id", "grade_name", "detail").where("isdelete", 0)
+    return res.json({
+      status: true,
+      data:result
+      });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+async function deleteFareGrade(req, res) {
+  try {
+    const { uid, id } = req.body;
+    await dbConfig("faregrade_master").where("id", id).update({ isdelete: 1 });
+    await dbConfig("logs").insert({
+      event_Id: id,
+      event_name: "FareGrade",
+      type: "DELETE",
+      createAt: new Date(),
+      createBy: uid,
+    });
+    return res.json({
+      status: true,
+      msg: "Deleted Successfully!!!",
+    });
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg:err.message,
+    })
+  }
+}
+
 
 const master = {
   //airport
@@ -652,6 +779,11 @@ const master = {
   // pax
   insertEditPax,
   paxList,
-  deletePax
+  deletePax,
+  //fargrade
+  getPax,
+  insertEditFareGrade,
+  fareGradeList,
+  deleteFareGrade
 };
 module.exports = master;

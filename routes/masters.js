@@ -32,5 +32,15 @@ router.post("/deletepilot", baseHelper.checkAdminToken, master.deletePilot);
 //pax
 router.post("/insertEditPax",baseHelper.checkAdminToken,master.insertEditPax);
 router.post("/paxList", baseHelper.checkAdminToken, master.paxList);
-router.post("/deletePax",baseHelper.checkAdminToken,master.deletePax);
+router.post("/deletePax", baseHelper.checkAdminToken, master.deletePax);
+
+// fargrade
+router.get('/getpax', baseHelper.checkAdminToken, master.getPax);
+router.post(
+  "/insertEditFarGrade",
+  baseHelper.checkAdminToken,
+  master.insertEditFareGrade
+);
+router.post("/fareGradeList", baseHelper.checkAdminToken, master.fareGradeList);
+router.post("/deleteFareGrade",baseHelper.checkAdminToken,master.deleteFareGrade);
 module.exports = router;
