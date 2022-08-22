@@ -24,6 +24,7 @@ router.post('/deleteaircraft', baseHelper.checkAdminToken, master.deleteaircraft
 router.post(
   "/insertEditPilot",
   baseHelper.checkAdminToken,
+  multer.fields([{ name:"licence_doc"},{name:"gov_doc"}]),
   master.insertEditPilot
 );
 router.post("/pilotlist", baseHelper.checkAdminToken, master.pilotList);

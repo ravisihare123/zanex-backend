@@ -375,27 +375,10 @@ async function deleteaircraft(req, res) {
 
 async function insertEditPilot(req, res) {
   try {
-    console.log(req.body);
     const { uid, id, name, mobile, alt_mobile, email, address, licence_no } =
       req.body;
+
     
-    console.log(id);
-
-    const licence_doc = req?.file?.licence_doc;
-    const gov_doc = req?.file?.gov_doc;
-    console.log(licence_doc);
-
-    const fs = require("fs");
-    const path = require("path");
-    let date = new Date();
-    const [month, day, year] = [
-      date.getMonth(),
-      date.getDate(),
-      date.getFullYear(),
-    ];
-    var dirName = day + "-" + month + "-" + year;
-console.log(dirName);
-
     var data = {
       name: name,
       mobile: mobile,
@@ -403,65 +386,48 @@ console.log(dirName);
       email: email,
       address: address,
       licence_no: licence_no,
-      // licence_doc:licence_doc,
-      // gov_doc: gov_doc,
+      licence_doc: req.myfilename,
+      gov_doc: req.myfilename
     };
-    
-    let dir_path, upload_path;
-    if (licence_doc) {
-      dir_path = "/licence_doc/" + dirName + "/";
-      upload_path = process.cwd() + "/public" + dir_path;
-      console.log(upload_path);
-      if (!fs.existsSync(upload_path)) {
-        fs.mkdirSync(upload_path, { recursive: true });
-      }
-      var licence_doc_name = date.getTime() + path.extname(licence_doc.name);
-      uploadPath = upload_path + licence_doc_name;
-      licence_doc.mv(uploadPath, function (err) {
-        if (err) {
-          return res.status(500).send(err);
-        }
+
+    const getData = await dbConfig("pilot_master").where("id", id).first();
+
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = uid;
+
+      await dbConfig("pilot_master").where("id", id).update(data);
+      await dbConfig("logs").insert({
+        event_Id: id,
+        event_name: "Pilot",
+        type: "UPDATE",
+        createAt: new Date(),
+        createBy: uid,
       });
-      data.licence_doc = dir_path + licence_doc_name;
-    }
-
-    if (gov_doc) {
-      dir_path = "/gov_doc/" + dirName + "/";
-      upload_path = process.cwd() + "/public" + dir_path;
-      if (!fs.existsSync(upload_path)) {
-        fs.mkdirSync(upload_path, { recursive: true });
-      }
-      var gov_doc_name = date.getTime() + path.extname(gov_doc.name);
-      uploadPath = upload_path + gov_doc_name;
-      gov_doc.mv(uploadPath, function (err) {
-        if (err) {
-          return res.status(500).send(err);
-        }
+      return res.json({
+        status: true,
+        msg: "Updated Successfully!!!",
       });
-      data.gov_doc = dir_path + gov_doc_name;
+    } else {
+      data.createAt = new Date();
+      data.createBy = uid;
+
+      var insert = await dbConfig("pilot_master").insert(data);
+      await dbConfig("logs").insert({
+        event_Id: insert[0],
+        event_name: "Pilot",
+        type: "INSERT",
+        createAt: new Date(),
+        createBy: uid,
+      });
+      return res.json({
+        status: true,
+        msg: "Inserted Successfully!!!",
+      });
     }
-
-    // if (id === "undefined") {
-     data.createAt = new Date();
-     data.createBy = uid;
-
-     await dbConfig("pilot_master").insert(data);
-     // await dbConfig("logs").insert({
-     //   event_Id: insert[0],
-     //   event_name: "Pilot",
-     //   type: "INSERT",
-     //   createAt: new Date(),
-     //   createBy: uid,
-     // });
-     return res.json({
-       st: true,
-       msg: "Inserted Successfully!!!",
-     }); 
-    // }
-    
   } catch (err) {
     return res.json({
-      st: false,
+      status: false,
       msg: err.message,
     });
   }
@@ -479,7 +445,7 @@ async function deletePilot(req, res) {
       createBy: uid,
     });
     return res.json({
-      st: true,
+      status: true,
       msg: "Deleted Successfully!!!",
     });
   } catch (err) {
