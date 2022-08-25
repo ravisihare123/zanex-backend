@@ -8,9 +8,8 @@ var severPath = multer.diskStorage({
 
     var newfilename = file.originalname;
     // file.originalname.substring(file.originalname.lastIndexOf("."))
-
-    req["myfilename"] = newfilename;
-    req["myfilename"] = newfilename;
+    req["myfilename"] = newfilename
+    req[file.fieldname] = newfilename;
 
     path(null, newfilename);
   },

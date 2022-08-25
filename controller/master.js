@@ -386,8 +386,8 @@ async function insertEditPilot(req, res) {
       email: email,
       address: address,
       licence_no: licence_no,
-      licence_doc: req.myfilename,
-      gov_doc: req.myfilename
+      licence_doc: req.licence_doc,
+      gov_doc: req.gov_doc,
     };
 
     const getData = await dbConfig("pilot_master").where("id", id).first();
@@ -724,6 +724,20 @@ async function deleteFareGrade(req, res) {
 }
 
 
+/// chargeTable
+async function InsertEditChargeTable(req, res) {
+  try {
+    const { } = req.body;
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message,
+    });
+  }
+}
+
+
 const master = {
   //airport
   insertEdit_Airport,
@@ -750,6 +764,8 @@ const master = {
   getPax,
   insertEditFareGrade,
   fareGradeList,
-  deleteFareGrade
+  deleteFareGrade,
+  // chargeTable
+  InsertEditChargeTable
 };
 module.exports = master;

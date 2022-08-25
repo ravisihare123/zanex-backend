@@ -43,5 +43,10 @@ router.post(
   master.insertEditFareGrade
 );
 router.post("/fareGradeList", baseHelper.checkAdminToken, master.fareGradeList);
-router.post("/deleteFareGrade",baseHelper.checkAdminToken,master.deleteFareGrade);
+router.post("/deleteFareGrade", baseHelper.checkAdminToken, master.deleteFareGrade);
+
+// chargeTable
+
+router.post("insertEditChargeTable", baseHelper.checkAdminToken, master.InsertEditChargeTable);
+
 module.exports = router;
