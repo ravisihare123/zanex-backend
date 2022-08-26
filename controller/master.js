@@ -727,7 +727,58 @@ async function deleteFareGrade(req, res) {
 /// chargeTable
 async function InsertEditChargeTable(req, res) {
   try {
-    const { } = req.body;
+    const { uid, id, charge_name, convenience_charge, over_weight_charge,rebooking, cancel, no_show } =
+      req.body;
+    
+    const getData = await dbConfig("chargetable_master").where("id", id).first();
+    
+    var data = {
+      charge_name: charge_name,
+      convenience_charge: convenience_charge,
+      over_weight_charge: over_weight_charge,
+      rebooking: JSON.stringify(rebooking),
+      cancel: JSON.stringify(cancel),
+      no_show:JSON.stringify(no_show)
+    }
+    
+
+    if (getData) {
+      data.updateAt = new Date();
+      data.updateBy = uid;
+
+      await dbConfig("chargetable_master").where("id", id).update(data);
+      await dbConfig("logs").insert({
+        event_Id: id,
+        event_name: "ChangeTable",
+        type: "UPDATE",
+        createAt: new Date(),
+        createBy: uid,
+      });
+      return res.json({
+        status: true,
+        msg: "Updated Successfully!!"
+      })
+      
+    }
+    else {
+      data.createAt = new Date();
+      data.createBy = uid;
+      
+      var insert = await dbConfig("chargetable_master").insert(data);
+      await dbConfig("logs").insert({
+        event_Id: insert[0],
+        event_name: "ChargeTable",
+        type: "INSERT",
+        createAt: new Date(),
+        createBy: uid,
+      });
+      return res.json({
+        status: true,
+        msg: "Inserted Successfully!!",
+      });
+    
+    }
+
     
   } catch (err) {
     return res.json({
@@ -736,6 +787,86 @@ async function InsertEditChargeTable(req, res) {
     });
   }
 }
+
+async function chargeTableList(req, res) {
+  try {
+    const { search_term } = req.body;
+
+    const getData = await dbConfig("chargetable_master")
+      .select(
+        "id",
+        "charge_name",
+        "rebooking",
+        "no_show",
+        "cancel",
+        "convenience_charge",
+        "over_weight_charge"
+      )
+      .where(
+        "charge_name",
+        "like",
+        "%" + search_term + "%"
+      )
+      .where("isdelete", 0);
+    
+    return res.json({
+      status: true,
+      data: getData
+    })
+
+    
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+    })
+  }
+}
+
+async function deleteChargeTable(req, res) {
+  try {
+    const { uid, id } = req.body;
+       await dbConfig("chargetable_master")
+         .where("id", id)
+         .update({ isdelete: 1 });
+       await dbConfig("logs").insert({
+         event_Id: id,
+         event_name: "ChargeTable",
+         type: "DELETE",
+         createAt: new Date(),
+         createBy: uid,
+       });
+       return res.json({
+         status: true,
+         msg: "Deleted Successfully!!!",
+       });
+  } catch (err) {
+    return res.json({
+      status: false,
+      msg: err.message
+  })
+  }
+}
+
+async function getChargeTableById(req, res) {
+  try {
+
+    const getList = await dbConfig("chargetable_master")
+      .where("isdelete", 0)
+      .andWhere("id", req.params["id"]);
+
+    return res.json({
+      st: true,
+      data: getList,
+    });
+  } catch (err) {
+    return res.json({
+      st: false,
+      msg: err.message,
+    });
+  }
+}
+
 
 
 const master = {
@@ -766,6 +897,9 @@ const master = {
   fareGradeList,
   deleteFareGrade,
   // chargeTable
-  InsertEditChargeTable
+  InsertEditChargeTable,
+  chargeTableList,
+  deleteChargeTable,
+  getChargeTableById,
 };
 module.exports = master;

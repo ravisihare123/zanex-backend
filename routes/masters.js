@@ -47,6 +47,13 @@ router.post("/deleteFareGrade", baseHelper.checkAdminToken, master.deleteFareGra
 
 // chargeTable
 
-router.post("insertEditChargeTable", baseHelper.checkAdminToken, master.InsertEditChargeTable);
+router.post("/insertEditChargeTable", baseHelper.checkAdminToken, master.InsertEditChargeTable);
+router.post("/chargetablelist", baseHelper.checkAdminToken, master.chargeTableList);
+router.post(
+  "/deleteChargeTable",
+  baseHelper.checkAdminToken,
+  master.deleteChargeTable
+);
+router.get("/getChargeTableById/:id",baseHelper.checkAdminToken, master.getChargeTableById);
 
 module.exports = router;
